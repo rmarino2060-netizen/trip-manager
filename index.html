@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+
+    <title>Organizador de Viagens</title>
+
+    <link rel="icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1>Organizador de Viagens</h1>
+        <p>Organize o que levar, onde guardar e o que ainda falta.</p>
+    </header>
+
+    <main>
+        <section class="section-box">
+            <button class="section-header" onclick="toggleSection('tripsContent', 'tripsIcon')">
+                <span class="section-title">Viagens</span>
+                <span id="tripsIcon" class="section-icon">+</span>
+            </button>
+
+            <div id="tripsContent" class="section-content hidden">
+                <button onclick="openTripModal()">Cadastrar viagem</button>
+                <div id="tripsList" class="trip-list"></div>
+            </div>
+        </section>
+
+        <section id="tripDetails" class="card hidden">
+            <h2 id="selectedTripTitle"></h2>
+            <p id="selectedTripInfo" class="small"></p>
+
+            <h3>Progresso</h3>
+            <p id="progressText" class="small"></p>
+
+            <div class="progress">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <section class="section-box">
+                <button class="section-header" onclick="toggleSection('locationsContent', 'locationsIcon')">
+                    <span class="section-title">Locais</span>
+                    <span id="locationsIcon" class="section-icon">+</span>
+                </button>
+
+                <div id="locationsContent" class="section-content hidden">
+                    <button onclick="openLocationModal()">Cadastrar local</button>
+                    <div id="locationsList" class="locations-grid"></div>
+                </div>
+            </section>
+
+            <section class="section-box">
+                <button class="section-header" onclick="toggleSection('itemsContent', 'itemsIcon')">
+                    <span class="section-title">Itens</span>
+                    <span id="itemsIcon" class="section-icon">+</span>
+                </button>
+
+                <div id="itemsContent" class="section-content hidden">
+                    <button onclick="openItemModal()">Cadastrar item</button>
+
+                    <div class="toolbar">
+                        <input type="text" id="searchInput" placeholder="Buscar item..." oninput="renderItems()" />
+
+                        <select id="filterStatus" onchange="renderItems()">
+                            <option value="todos">Todos</option>
+                            <option value="pendentes">Pendentes</option>
+                            <option value="organizados">Organizados</option>
+                            <option value="sem-local">Sem local</option>
+                        </select>
+                    </div>
+
+                    <div class="item-workspace">
+                        <div id="itemsList" class="items-scroll"></div>
+
+                        <aside class="actions-panel">
+                            <h3>Ações</h3>
+                            <p id="selectedItemText" class="small">Nenhum item selecionado.</p>
+
+                            <button id="editItemButton" onclick="editSelectedItem()" disabled>
+                                Editar item
+                            </button>
+
+                            <button id="deleteItemButton" class="danger" onclick="deleteSelectedItem()" disabled>
+                                Excluir item
+                            </button>
+
+                            <button id="clearItemButton" class="secondary" onclick="clearSelectedItem()" disabled>
+                                Desmarcar item
+                            </button>
+                        </aside>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <dialog id="tripModal">
+        <div class="modal-content">
+            <h2 id="tripModalTitle">Cadastrar viagem</h2>
+
+            <input type="hidden" id="tripId" />
+
+            <input type="text" id="tripName" placeholder="Nome da viagem *" />
+            <input type="text" id="tripDestination" placeholder="Destino" />
+
+            <div class="grid-2">
+                <input type="date" id="tripStart" />
+                <input type="date" id="tripEnd" />
+            </div>
+
+            <textarea id="tripNotes" placeholder="Observações"></textarea>
+
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeTripModal()">Cancelar</button>
+                <button onclick="saveTrip()">Salvar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="locationModal">
+        <div class="modal-content">
+            <h2>Cadastrar local</h2>
+
+            <input type="text" id="locationName" placeholder="Ex: Mala Azul, Mochila, Necessaire" />
+
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeLocationModal()">Cancelar</button>
+                <button onclick="saveLocation()">Salvar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="itemModal">
+        <div class="modal-content">
+            <h2 id="itemModalTitle">Cadastrar item</h2>
+
+            <input type="hidden" id="itemId" />
+
+            <input type="text" id="itemName" placeholder="Nome do item *" />
+
+            <div class="grid-2">
+                <input type="number" id="itemQuantity" placeholder="Quantidade" min="1" value="1" />
+
+                <select id="itemCategory">
+                    <option value="Vestuário">Vestuário</option>
+                    <option value="Higiene">Higiene</option>
+                    <option value="Eletrônicos">Eletrônicos</option>
+                    <option value="Documentos">Documentos</option>
+                    <option value="Medicamentos">Medicamentos</option>
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+
+            <select id="itemLocation">
+                <option value="">Sem local definido</option>
+            </select>
+
+            <select id="itemPriority">
+                <option value="Normal">Prioridade normal</option>
+                <option value="Alta">Prioridade alta</option>
+                <option value="Baixa">Prioridade baixa</option>
+            </select>
+
+            <textarea id="itemNotes" placeholder="Observações"></textarea>
+
+            <input type="file" id="itemPhoto" accept="image/*" />
+            <div id="photoPreview"></div>
+
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeItemModal()">Cancelar</button>
+                <button onclick="saveItem()">Salvar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <div id="message"></div>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("service-worker.js")
+                    .then(() => console.log("Service Worker registrado"))
+                    .catch(error => console.error("Erro ao registrar Service Worker:", error));
+            });
+        }
+    </script>
+</body>
+
+</html>
