@@ -3,16 +3,16 @@
 // por exemplo:
 // const CACHE_NAME = "meu-app-cache-v1";
 
-const CACHE_NAME = "meu-app-cache-v1";
+const CACHE_NAME = "meu-app-cache-v0";
 
 const FILES_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/script.js",
-  "/manifest.json",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
+  "./",
+  "./index.html",
+  "./style.css",
+  "./script.js",
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", event => {
